@@ -22,15 +22,20 @@ project(luatest VERSION 0.1.0)
 # just did it the dumb way and ran Make in lua-5.4.0 and liblua.a ends up in
 # lua-5.4.0/src
 # this makes that slightly less gross
-set(LUA_DIR "lua-5.4.0/src")
+# set(LUA_DIR "lua-5.4.0/src")
 
-include(CTest)
-enable_testing()
+# include(CTest)
+# enable_testing()
+
+# let's try it pure-cmake
+add_subdirectory(lua-5.4.0)
 
 add_executable(luatest main.cpp)
-target_include_directories(luatest PUBLIC ${LUA_DIR})
-target_link_directories(luatest PUBLIC ${LUA_DIR})
+# target_include_directories(luatest PUBLIC ${LUA_DIR})
+# target_link_directories(luatest PUBLIC ${LUA_DIR})
 # dl avoids the link errors against dlopen, dlclose, etc.
+# can avoid the need for it if I change luaconf.h, qv; find out what dlopen is for
+# if it's for dynamic linking, I can avoid
 target_link_libraries(luatest lua dl)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

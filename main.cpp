@@ -29,15 +29,13 @@ int luaadd (lua_State *L, int x, int y )
 	/* the function name */
 	int res = lua_getglobal(L, "add");
 
-    // sean adds: check to see if that was successful - if not, bail with a 0
-    // dunno if TNIL is the value, but does seem to be a 0 if there's no add
-    // per https://www.lua.org/manual/5.4/manual.html#lua_getglobal, the return value is
-    // "Returns the type of that value." looks like when it worked, it was a 6
-    // which is LUA_TFUNCTION
-    if(res != LUA_TFUNCTION) {
-        printf("'add' function isn't defined!\n");
-        return 0;
-    }
+  // sean adds: check to see if that was successful - if not, bail with a 0
+  // per https://www.lua.org/manual/5.4/manual.html#lua_getglobal, the return value is
+  // "Returns the type of that value." looks like when it's loaded, res is 6 which is LUA_TFUNCTION
+  if(res != LUA_TFUNCTION) {
+      printf("'add' function isn't defined!\n");
+      return 0;
+  }
 
 	/* the first argument */
 	lua_pushnumber(L, x);
