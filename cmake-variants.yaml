@@ -1,0 +1,47 @@
+buildType:
+  default: debug
+  choices:
+    debug:
+      short: Debug
+      long: Emit debug information
+      buildType: Debug
+    release:
+      short: Release
+      long: Optimize generated code
+      buildType: Release
+
+# ok so platform - need this kind of thing too
+# settings (Optional)
+#    A map of arbitrary CMake cache options to pass via the CMake command line with -D. 
+# Similar to the cmake.configureSettings in settings.json.
+
+platform:
+  default: Linux
+  choices:
+    Linux:
+      short: Linux
+      long: Compile for Linux platform
+      platform: Linux
+      settings:
+        TARGET_PLATFORM: LinuxConsole
+        # do this explicitly or it persists in the cache(?)
+        TEST_COVERAGE: OFF
+    # LinuxCoverage that compiles with the clang coverage options by setting TEST_COVERAGE ON 
+    # and the cmakelists will pick up on that
+    LinuxCov:
+      short: LinuxCov
+      long: Compile for Linux platform with clang coverage 
+      platform: Linux
+      settings:
+        TARGET_PLATFORM: LinuxConsole
+        TEST_COVERAGE: ON
+    Arduino:
+      short: Arduino
+      long: Compile for Arduino platform
+      platform: Arduino
+      settings:
+        TARGET_PLATFORM: ArduinoSerial
+        # toolchain goes in kit
+        #CMAKE_TOOLCHAIN_FILE: Arduino-CMake-Toolchain/Arduino-toolchain.cmake
+        #ARDUINO_INSTALL_PATH: /home/sean/software/arduino-1.8.12/
+        #ARDUINO_BOARD: "Adafruit Circuit Playground Express [samd.adafruit_circuitplayground_m0]"

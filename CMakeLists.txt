@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.14.0)    # arduino stuff needs some recent cmake
 project(luatest VERSION 0.1.0)
 
 # not sure I want to do this like this
@@ -28,15 +28,52 @@ project(luatest VERSION 0.1.0)
 # enable_testing()
 
 # let's try it pure-cmake
-add_subdirectory(lua-5.4.0)
 
 add_executable(luatest main.cpp)
+
+# platform specific libraries and includes 
+if(TARGET_PLATFORM MATCHES "Arduino*")
+    if(TARGET_PLATFORM STREQUAL "ArduinoSerial")
+        message("Adding plat_arduino_serial subdirectory & includes")
+        add_subdirectory("${PROJECT_SOURCE_DIR}/plat_arduino_serial")
+        list(APPEND EXTRA_INCLUDES "${PROJECT_SOURCE_DIR}/plat_arduino_serial")
+    endif()
+    # make lua all 32-bit
+    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DLUA_32BITS")
+    target_link_arduino_libraries(luatest PRIVATE core)
+    # OTHER LIBRARIES LIKE MCUFRIEND OR WHATEVER GO HERE 
+    # target for making it generate hex 
+    target_enable_arduino_upload(luatest)
+elseif(TARGET_PLATFORM MATCHES "Linux*")
+    #add the dl library 
+    list(APPEND EXTRA_LIBS dl)
+    if(TARGET_PLATFORM STREQUAL "LinuxConsole")
+        add_subdirectory("${PROJECT_SOURCE_DIR}/plat_linux_console")
+        message("Hey about to add plat linux console")
+        list(APPEND EXTRA_INCLUDES "${PROJECT_SOURCE_DIR}/plat_linux_console")
+    endif()
+endif()
+
+# MAKE THIS MORE VISIBLE
+set(LUA_DIR "lua-5.4.0")
+list(APPEND EXTRA_INCLUDES "${LUA_DIR}/src")      # is this how you do this?
+add_subdirectory(lua-5.4.0)
+
+# add the platspec libraries 
+list(APPEND EXTRA_LIBS PlatIO)
+
+# and the lua library
+list(APPEND EXTRA_LIBS lua)
+
 # target_include_directories(luatest PUBLIC ${LUA_DIR})
 # target_link_directories(luatest PUBLIC ${LUA_DIR})
 # dl avoids the link errors against dlopen, dlclose, etc.
 # can avoid the need for it if I change luaconf.h, qv; find out what dlopen is for
 # if it's for dynamic linking, I can avoid
-target_link_libraries(luatest lua dl)
+target_link_libraries(luatest PUBLIC ${EXTRA_LIBS})
+target_link_libraries(luatest PUBLIC PlatLuatestMain)     # don't forget the main!
+target_include_directories(luatest PUBLIC ${EXTRA_INCLUDES})
+
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

@@ -17,6 +17,10 @@
 # include <lauxlib.h>
 #endif
 
+//platform-specific
+#include "plat_io.h"
+#include "plat_luatest_main.h"
+
 // let's see if I can load a lua script without just straight up running it, and call functions
 // in it - the idea being that game actors would have certain interface functions - or we can
 // discover what functions are available?
@@ -33,7 +37,7 @@ int luaadd (lua_State *L, int x, int y )
   // per https://www.lua.org/manual/5.4/manual.html#lua_getglobal, the return value is
   // "Returns the type of that value." looks like when it's loaded, res is 6 which is LUA_TFUNCTION
   if(res != LUA_TFUNCTION) {
-      printf("'add' function isn't defined!\n");
+      plprintf("'add' function isn't defined!\n");
       return 0;
   }
 
@@ -65,10 +69,10 @@ int howdy(lua_State* state)
   // The number of function arguments will be on top of the stack.
   int args = lua_gettop(state);
 
-  printf("howdy() was called with %d arguments:\n", args);
+  plprintf("howdy() was called with %d arguments:\n", args);
 
   for ( int n=1; n<=args; ++n) {
-    printf("  argument %d: '%s'\n", n, lua_tostring(state, n));
+    plprintf("  argument %d: '%s'\n", n, lua_tostring(state, n));
   }
 
   // Push the return value on top of the stack. NOTE: We haven't popped the
@@ -95,11 +99,11 @@ void print_error(lua_State* state) {
   // The error message is on top of the stack.
   // Fetch it, print it and then pop it off the stack.
   const char* message = lua_tostring(state, -1);
-  puts(message);
+  plprintf(message);
   lua_pop(state, 1);
 }
 
-void execute(const char* filename)
+void execute(const char* code)
 {
   lua_State *state = luaL_newstate();
 
@@ -113,7 +117,8 @@ void execute(const char* filename)
   int result;
 
   // Load the program; this supports both source code and bytecode files.
-  result = luaL_loadfile(state, filename);
+  // sean changes from a filename to code we'll directly run
+  result = luaL_loadstring(state, code);
 
   if ( result != LUA_OK ) {
     print_error(state);
@@ -131,27 +136,34 @@ void execute(const char* filename)
   }
 
   // Try calling the add function
-  printf("Calling lua add function with 5 and 2\n");
+  plprintf("Calling lua add function with 5 and 2\n");
   int res = luaadd(state, 5, 2);
-  printf("Result is %d\n",res);
+  plprintf("Result is %d\n",res);
 }
 
-int main(int argc, char** argv)
+// main is now inside the platform-specfic dirs
+//int main(int argc, char** argv)
+
+const char *lua_program = "io.write(string.format(\"Hello from %s\\n\", _VERSION))";
+
+void run()
 {
-  if ( argc <= 1 ) {
-    puts("Usage: luatest file(s)");
-    puts("Loads and executes Lua programs.");
-    return 1;
+  // if ( argc <= 1 ) {
+  //   puts("Usage: luatest file(s)");
+  //   puts("Loads and executes Lua programs.");
+  //   return 1;
 
-    //temp: just run "hello.lua"
-    // execute("hello.lua");
-    //execute("add.lua");
-  }
+  //   //temp: just run "hello.lua"
+  //   // execute("hello.lua");
+  //   //execute("add.lua");
+  // }
 
-  // Execute all programs on the command line
-  for ( int n=1; n<argc; ++n ) {
-    execute(argv[n]);
-  }
+  // // Execute all programs on the command line
+  // for ( int n=1; n<argc; ++n ) {
+  //   execute(argv[n]);
+  // }
 
-  return 0;
+  // return 0;
+
+  execute(lua_program);
 }
