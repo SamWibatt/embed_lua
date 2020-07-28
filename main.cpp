@@ -176,10 +176,11 @@ void run()
 
   // return 0;
 
-  //execute(lua_program1);
+  plprintf("===============================================\n");
+  execute(lua_program1);
   plprintf("===============================================\n");
   // looks like "howdy" makes it hang after hello
-  //execute(lua_program2);
+  execute(lua_program2);
   plprintf("===============================================\n");
   // so does add... or is it just that running more than 1 program kills it? running ONLY add works - running ONLY howdy gets as far as howdy printing its args
   // result is wrong but add does call and return...
