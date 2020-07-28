@@ -44,4 +44,5 @@ platform:
         # toolchain goes in kit
         #CMAKE_TOOLCHAIN_FILE: Arduino-CMake-Toolchain/Arduino-toolchain.cmake
         #ARDUINO_INSTALL_PATH: /home/sean/software/arduino-1.8.12/
-        #ARDUINO_BOARD: "Adafruit Circuit Playground Express [samd.adafruit_circuitplayground_m0]"
+        #ARDUINO_BOARD: "Adafruit Grand Central M4 (SAMD51) [samd.adafruit_grandcentral_m4]"
+        ARDUINO_BOARD: "Adafruit Circuit Playground Express [samd.adafruit_circuitplayground_m0]"

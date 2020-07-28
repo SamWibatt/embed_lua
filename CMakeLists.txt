@@ -74,6 +74,22 @@ target_link_libraries(luatest PUBLIC ${EXTRA_LIBS})
 target_link_libraries(luatest PUBLIC PlatLuatestMain)     # don't forget the main!
 target_include_directories(luatest PUBLIC ${EXTRA_INCLUDES})
 
+if(TARGET_PLATFORM MATCHES "Arduino*")
+  add_custom_command(TARGET luatest POST_BUILD
+    USES_TERMINAL
+    VERBATIM
+    COMMAND echo "**********************************************************************************************"
+    COMMAND echo "**********************************************************************************************"
+    COMMAND echo "**********************************************************************************************"
+    COMMAND echo ".bin and .hex files have been emitted for luatest"
+    COMMAND echo "Assuming a SAMD21 target, you can burn with bossac installed with  e.g." 
+    COMMAND echo "~/.arduino15/packages/arduino/tools/bossac/1.7.0-arduino3/bossac -i -d --port=<device port> -U true -i -e -w -v luatest.bin -R"
+    COMMAND echo "**********************************************************************************************"
+    COMMAND echo "**********************************************************************************************"
+    COMMAND echo "**********************************************************************************************"
+  )
+endif()
+
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

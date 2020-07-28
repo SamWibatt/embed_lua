@@ -41,17 +41,24 @@ int luaadd (lua_State *L, int x, int y )
       return 0;
   }
 
+  plprintf("Add is defined! pushing x\n");
+
 	/* the first argument */
 	lua_pushnumber(L, x);
 
+  plprintf("Pushing y\n");
 	/* the second argument */
 	lua_pushnumber(L, y);
 
+  plprintf("Doing lua call\n");
 	/* call the function with 2 arguments, return 1 result */
 	lua_call(L, 2, 1);
 
 	/* get the result */
+  plprintf("Getting result\n");
 	sum = (int)lua_tointeger(L, -1);
+
+  plprintf("Cleaning up lua stack - sum is %d\n",sum);
 	lua_pop(L, 1);
 
 	return sum;
@@ -71,6 +78,7 @@ int howdy(lua_State* state)
 
   plprintf("howdy() was called with %d arguments:\n", args);
 
+  // on arduino this messes up a bit, numeric argument came back as 'ld'
   for ( int n=1; n<=args; ++n) {
     plprintf("  argument %d: '%s'\n", n, lua_tostring(state, n));
   }
@@ -144,7 +152,10 @@ void execute(const char* code)
 // main is now inside the platform-specfic dirs
 //int main(int argc, char** argv)
 
-const char *lua_program = "io.write(string.format(\"Hello from %s\\n\", _VERSION))";
+const char *lua_program1 = "io.write(string.format(\"Hello from %s\\n\", _VERSION))";
+const char *lua_program2 = 
+  "io.write(\"Calling howdy() ...\\n\")\nlocal value = howdy(\"First\", \"Second\", 112233)\nio.write(string.format(\"howdy() returned: %s\\n\", tostring(value)))";
+const char *lua_program3 = "function add ( x, y )\nreturn x + y\nend";
 
 void run()
 {
@@ -165,5 +176,22 @@ void run()
 
   // return 0;
 
-  execute(lua_program);
+  //execute(lua_program1);
+  plprintf("===============================================\n");
+  // looks like "howdy" makes it hang after hello
+  //execute(lua_program2);
+  plprintf("===============================================\n");
+  // so does add... or is it just that running more than 1 program kills it? running ONLY add works - running ONLY howdy gets as far as howdy printing its args
+  // result is wrong but add does call and return...
+  // ===============================================
+  // Calling lua add function with 5 and 2
+  // Add is defined! pushing x
+  // Pushing y
+  // Doing lua call
+  // Getting result
+  // Cleaning up lua stack - sum is 0
+  // Result is 0
+  // ===============================================  
+  execute(lua_program3);
+  plprintf("===============================================\n");
 }
